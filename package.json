@@ -13,7 +13,7 @@
     "build": "quasar build"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.4",
+    "@quasar/extras": "^1.16.11",
     "cors-anywhere": "^0.4.4",
     "file-saver": "^2.0.5",
     "pdfjs-dist": "^4.3.136",

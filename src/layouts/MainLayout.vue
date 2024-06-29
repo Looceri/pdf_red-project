@@ -16,15 +16,10 @@
       <q-list>
         <q-item-label header>
           PDFs Baixados
-          <q-btn flat dense round icon="delete" @click="resetDownloadedPdfs" style="float: right;" />
+          <q-btn flat dense round icon="delete" @click="resetpdfs" style="float: right;" />
         </q-item-label>
 
-        <q-item
-          v-for="(pdf, index) in downloadedPdfs"
-          :key="index"
-          clickable
-          @click="openPdf(pdf.blob)"
-        >
+        <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.blob)">
           <q-item-section avatar>
             <q-icon name="description" />
           </q-item-section>
@@ -39,9 +34,9 @@
       <q-page padding>
         <q-file v-model="selectedFile" label="Selecionar PDF do dispositivo" @input="handleFileSelected" />
 
-        <q-card v-if="downloadedPdf">
+        <q-card v-if="pdf">
           <q-card-section>
-            <q-pdf-viewer :src="downloadedPdf" />
+            <q-pdf-viewer :src="pdf" />
           </q-card-section>
         </q-card>
       </q-page>
@@ -57,8 +52,8 @@ defineOptions({
 })
 
 const leftDrawerOpen = ref(false)
-const downloadedPdf = ref(null)
-const downloadedPdfs = ref(['sagfdsa','asdasd'])
+const pdf = ref(null)
+const pdfs = ref([])
 const selectedFile = ref(null)
 
 function toggleLeftDrawer() {
@@ -66,51 +61,37 @@ function toggleLeftDrawer() {
 }
 
 function openPdf(blob) {
-  downloadedPdf.value = URL.createObjectURL(blob);
+  pdf.value = URL.createObjectURL(blob);
 }
 
 // Lógica para lidar com o PDF selecionado no q-file
 function handleFileSelected(file) {
-  if (file.file) {
-    // Adicione o PDF à lista downloadedPdfs
-    downloadedPdfs.value.push({
-      filename: file.file.name,
-      blob: file.file,
+  const selectedFile = file.target.files[0];
+  console.log(pdfs, pdf);
+  if (selectedFile) {
+    pdfs.value.push({
+      filename: selectedFile.name,
+      blob: selectedFile,
     });
 
-
-    console.log(downloadedPdfs)
-    // Exiba o PDF
-    downloadedPdf.value = URL.createObjectURL(file.file);
+    pdf.value = URL.createObjectURL(selectedFile);
   }
 }
 
-// Lógica de download e armazenamento do PDF
-async function downloadPDF(url) {
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const filename = url.split('/').pop();
-
-    downloadedPdfs.value.push({ filename, blob }); // Armazena o Blob
-  } catch (error) {
-    console.error('Erro ao baixar PDF:', error);
-  }
-}
 
 // Função para resetar a lista de PDFs baixados
-function resetDownloadedPdfs() {
+function resetpdfs() {
   if (confirm("Tem certeza que deseja eliminar a lista de PDFs baixados?")) {
-    downloadedPdfs.value = [];
-    localStorage.removeItem('downloadedPdfs');
+    pdfs.value = [];
+    localStorage.removeItem('pdfs');
   }
 }
 
 onMounted(() => {
-  const savedPdfs = localStorage.getItem('downloadedPdfs');
+  const savedPdfs = localStorage.getItem('pdfs');
   if (savedPdfs) {
     // Carregar PDFs baixados do localStorage (se houver)
-    downloadedPdfs.value = JSON.parse(savedPdfs).map(pdf => ({
+    pdfs.value = JSON.parse(savedPdfs).map(pdf => ({
       filename: pdf.filename,
       blob: new Blob([pdf.blob], { type: 'application/pdf' })
     }));
@@ -118,8 +99,8 @@ onMounted(() => {
 });
 
 // Quando a lista de PDFs for atualizada, salve no localStorage:
-watch(downloadedPdfs, (newPdfs) => {
-  localStorage.setItem('downloadedPdfs', JSON.stringify(newPdfs.map(pdf => ({
+watch(pdfs, (newPdfs) => {
+  localStorage.setItem('pdfs', JSON.stringify(newPdfs.map(pdf => ({
     filename: pdf.filename,
     blob: Array.from(pdf.blob)
   }))));
