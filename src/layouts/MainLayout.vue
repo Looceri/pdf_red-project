@@ -12,7 +12,7 @@
         <q-file v-if="pdfUrl" class="text-white" v-model="selectedFile" filled label="Pdf +" accept=".pdf" color="red"
           :label-color="isHovering ? 'red' : 'white'" :class="{ 'bg-white': isHovering }" outlined outlined-color="red"
           @update:model-value="adicionarPDF" style="box-shadow: none;
-                 width: 10vw;" @mouseover="isHovering = true" @mouseleave="isHovering = false" />
+                 width: 18vw;" @mouseover="isHovering = true" @mouseleave="isHovering = false" />
       </q-toolbar>
     </q-header>
 
@@ -23,10 +23,10 @@
           <q-btn flat dense round icon="delete" @click="resetpdfs" class="float-right" size="sm" color="white" />
         </q-item-label>
         <q-separator />
-        <q-scroll-area style="height: calc(100% - 50px);">
+        <q-scroll-area style="height: 200px;">
           <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.url)">
             <q-item-section avatar>
-              <q-icon name="description" color="white" /> <!--- Cor do ícone -->
+              <q-icon name="description" color="red" /> <!--- Cor do ícone -->
             </q-item-section>
             <q-item-section>
               {{ pdf.nome }}
@@ -47,7 +47,7 @@
             color="red" />
         </q-item-label>
         <q-separator />
-        <q-scroll-area style="height: calc(100% - 50px);">
+        <q-scroll-area style="height: 200px;">
           <q-item v-for="(pdf, index) in pdfsCarregados" :key="index" clickable @click="openPdf(pdf.url)">
             <q-item-section avatar>
               <q-icon name="description" />
