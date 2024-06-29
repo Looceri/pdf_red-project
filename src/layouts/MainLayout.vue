@@ -2,65 +2,146 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-red text-white">
       <q-toolbar>
-        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" color="white" />
+        <q-btn
+          dense
+          flat
+          round
+          icon="menu"
+          @click="toggleLeftDrawer"
+          color="white"
+        />
         <q-toolbar-title>
           <q-avatar>
             <img src="../assets/Sem título.svg" />
           </q-avatar>
           PDf REd
         </q-toolbar-title>
-        <q-file v-if="pdfUrl" class="text-white" v-model="selectedFile" filled label="Pdf +" accept=".pdf" color="red"
-          :label-color="isHovering ? 'red' : 'white'" :class="{ 'bg-white': isHovering }" outlined outlined-color="red"
-          @update:model-value="adicionarPDF" style="box-shadow: none;
-                 width: 18vw;" @mouseover="isHovering = true" @mouseleave="isHovering = false" />
+        <q-file
+          v-if="pdfUrl"
+          class="text-white"
+          v-model="selectedFile"
+          filled
+          label="Pdf +"
+          accept=".pdf"
+          color="red"
+          :label-color="isHovering ? 'red' : 'white'"
+          :class="{ 'bg-white': isHovering }"
+          outlined
+          outlined-color="red"
+          @update:model-value="adicionarPDF"
+          style="box-shadow: none; width: 18vw"
+          @mouseover="isHovering = true"
+          @mouseleave="isHovering = false"
+        />
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
+    <q-drawer
+      v-model="leftDrawerOpen"
+      side="left"
+      bordered
+      :width="250"
+    >
       <q-list>
-        <q-expansion-item expand-icon="chevron_down" :label="'PDFs Recentes'" :header-class="'text-white bg-red'"
-          class="q-pa-sm">
-          <template v-slot:header-actions>
-          </template>
+        <q-expansion-item
+          expand-icon="chevron_down"
+          :label="'PDFs Recentes'"
+          :header-class="'text-white bg-red'"
+          class="q-pa-sm"
+        >
+          <template v-slot:header-actions> </template>
           <q-separator />
-          <q-btn flat dense round icon="delete" @click="resetpdfs" class="float-right" size="sm" color="red" />
-          <q-scroll-area style="height: 200px;">
-            <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.data, pdf.nome)">
+          <q-btn
+            flat
+            dense
+            round
+            icon="delete"
+            @click="resetpdfs"
+            class="float-right"
+            size="sm"
+            color="red"
+          />
+          <q-scroll-area style="height: 200px">
+            <q-item
+              v-for="(pdf, index) in pdfs"
+              :key="index"
+              clickable
+              @click="openPdf(pdf.data, pdf.nome)"
+            >
               <q-item-section avatar>
                 <q-icon name="description" color="red" />
               </q-item-section>
               <q-item-section>
                 {{ pdf.nome }}
               </q-item-section>
-              <q-btn flat dense round icon="delete" @click="removerPDF(index)" class="float-right" size="sm"
-                color="red" />
+              <q-btn
+                flat
+                dense
+                round
+                icon="delete"
+                @click="removerPDF(index)"
+                class="float-right"
+                size="sm"
+                color="red"
+              />
             </q-item>
-            <q-empty v-if="pdfs.length === 0" icon="description" message="Nenhum PDF adicionado." />
+            <q-empty
+              v-if="pdfs.length === 0"
+              icon="description"
+              message="Nenhum PDF adicionado."
+            />
           </q-scroll-area>
         </q-expansion-item>
 
         <q-separator />
 
-        <q-expansion-item expand-icon="chevron_down" :label="'PDFs Carregados'" :header-class="'text-grey-8'"
-          class="q-pa-sm">
-          <template v-slot:header-actions>
-          </template>
+        <q-expansion-item
+          expand-icon="chevron_down"
+          :label="'PDFs Carregados'"
+          :header-class="'text-grey-8'"
+          class="q-pa-sm"
+        >
+          <template v-slot:header-actions> </template>
           <q-separator />
-          <q-btn flat dense round icon="delete" @click="limparPDFsCarregados" class="float-right" size="sm"
-            color="red" />
-          <q-scroll-area style="height: 200px;">
-            <q-item v-for="(pdf, index) in pdfsCarregados" :key="index" clickable
-              @click="openPdf(pdf.data, pdf.nome)">
+          <q-btn
+            flat
+            dense
+            round
+            icon="delete"
+            @click="limparPDFsCarregados"
+            class="float-right"
+            size="sm"
+            color="red"
+          />
+          <q-scroll-area style="height: 200px">
+            <q-item
+              v-for="(pdf, index) in pdfsCarregados"
+              :key="index"
+              clickable
+              @click="openPdf(pdf.data, pdf.nome)"
+            >
               <q-item-section avatar>
                 <q-icon name="description" />
               </q-item-section>
               <q-item-section>
                 {{ pdf.nome }}
               </q-item-section>
-              <q-btn flat dense round icon="delete" @click="removerPDFCarregado(index)" class="float-right" size="sm"
-                color="red" />
+              <q-btn
+                flat
+                dense
+                round
+                icon="delete"
+                @click="removerPDFCarregado(index)"
+                class="float-right"
+                size="sm"
+                color="red"
+              />
             </q-item>
-            <q-empty v-if="pdfsCarregados.length === 0" icon="description" message="Nenhum PDF carregado." />
+            <q-empty
+              v-if="pdfsCarregados.length === 0"
+              icon="description"
+              message="Nenhum PDF carregado."
+            />
           </q-scroll-area>
         </q-expansion-item>
       </q-list>
@@ -70,17 +151,43 @@
       <q-page class="row">
         <div v-if="pdfUrl" class="col-12 q-pa-md">
           <q-card flat bordered class="full-height bg-transparent">
-            <q-card-section class="bg-grey-1 full-height column bg-transparent">
-              <q-inner-loading :showing="isLoading" class="absolute-center bg-transparent">
-                <q-spinner-gears size="100%" color="red" class="bg-transparent" />
+            <q-card-section
+              class="bg-grey-1 full-height column bg-transparent"
+            >
+              <q-inner-loading
+                :showing="isLoading"
+                class="absolute-center bg-transparent"
+              >
+                <q-spinner-gears
+                  size="100%"
+                  color="red"
+                  class="bg-transparent"
+                />
               </q-inner-loading>
-              <q-pdfviewer :src="pdfUrl" type="html5" style="height: 100%;"></q-pdfviewer>
+              <q-pdfviewer
+                :src="pdfUrl"
+                type="html5"
+                style="height: 100%"
+              ></q-pdfviewer>
             </q-card-section>
           </q-card>
         </div>
-        <div v-else :class="{ 'col-12': !pdfUrl }" class="q-pa-md full-height column justify-center items-center">
-          <q-file v-model="selectedFile" filled label="Selecione um PDF" accept=".pdf" style="width: 100%;" color="red"
-            outlined outlined-color="red" @update:model-value="adicionarPDF" />
+        <div
+          v-else
+          :class="{ 'col-12': !pdfUrl }"
+          class="q-pa-md full-height column justify-center items-center"
+        >
+          <q-file
+            v-model="selectedFile"
+            filled
+            label="Selecione um PDF"
+            accept=".pdf"
+            style="width: 100%"
+            color="red"
+            outlined
+            outlined-color="red"
+            @update:model-value="adicionarPDF"
+          />
         </div>
       </q-page>
     </q-page-container>
@@ -131,10 +238,18 @@ export default {
           };
           reader.readAsDataURL(file);
         } else {
-          console.error("O arquivo selecionado não é um PDF.");
+          // Utilize um componente Quasar para exibir a mensagem de erro
+          this.$q.notify({
+            message: 'O arquivo selecionado não é um PDF.',
+            color: 'negative',
+          });
         }
       } else {
-        console.error("Por favor, selecione um PDF.");
+        // Utilize um componente Quasar para exibir a mensagem de erro
+        this.$q.notify({
+          message: 'Por favor, selecione um PDF.',
+          color: 'negative',
+        });
       }
     }
 
@@ -148,10 +263,18 @@ export default {
     }
 
     function resetpdfs() {
-      if (confirm('Tem certeza que deseja eliminar a lista de PDFs todos recentes?')) {
-        localStorage.clear();
-        pdfs.value = [];
-      }
+      // Utilize um componente Quasar para exibir o diálogo de confirmação
+      this.$q
+        .dialog({
+          title: 'Confirmação',
+          message:
+            'Tem certeza que deseja eliminar a lista de PDFs todos recentes?',
+          cancel: true,
+        })
+        .onOk(() => {
+          localStorage.clear();
+          pdfs.value = [];
+        });
     }
 
     function carregarPDFsDoLocalStorage() {
@@ -182,7 +305,7 @@ export default {
       resetpdfs,
       limparPDFsCarregados,
     };
-  }
+  },
 };
 </script>
 
