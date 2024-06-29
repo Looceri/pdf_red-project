@@ -1,0 +1,20 @@
+<project>
+    <documents></documents>
+    <dmdesigns>
+        <dmdesign active>
+            <dmdesignskill skill="quasar.colors">
+                <dmcolor key="primary" color="#6750a4" shade-50="#eeedf4" shade-100="#d8d1e6" shade-200="#c2b6d9" shade-300="#ac9ccc" shade-400="#9582bf" shade-500="#7e68b1" shade-600="#6750a4" shade-700="#5e4996" shade-800="#564388" shade-900="#4d3c7b" shade-950="#45366e" shade-DEFAULT="#3d2f61"/>
+                <dmcolor key="secondary" color="#625b71" shade-50="#eeeeef" shade-100="#d5d4d9" shade-200="#bdbac3" shade-300="#a6a1ae" shade-400="#8e8999" shade-500="#787285" shade-600="#625b71" shade-700="#5a5367" shade-800="#524c5e" shade-900="#4a4455" shade-950="#423d4c" shade-DEFAULT="#3a3643"/>
+                <dmcolor key="tertiary" color="#7d5260" shade-50="#f0edee" shade-100="#ddd2d5" shade-200="#c9b7bc" shade-300="#b69da4" shade-400="#a3838d" shade-500="#906a76" shade-600="#7d5260" shade-700="#724b58" shade-800="#684450" shade-900="#5e3e48" shade-950="#543740" shade-DEFAULT="#4a3139"/>
+                <dmcolor key="success" color="#2e7d32" shade-50="#ecf0ec" shade-100="#cdddcb" shade-200="#aec9ab" shade-300="#90b68c" shade-400="#71a36d" shade-500="#519050" shade-600="#2e7d32" shade-700="#2a722e" shade-800="#26682a" shade-900="#235e26" shade-950="#1f5422" shade-DEFAULT="#519050"/>
+                <dmcolor key="warning" color="#ed6c02" shade-50="#fcefeb" shade-100="#ffd9c7" shade-200="#ffc4a4" shade-300="#ffae7f" shade-400="#fb985c" shade-500="#f58238" shade-600="#ed6c02" shade-700="#d96302" shade-800="#c55a02" shade-900="#b25102" shade-950="#9f4801" shade-DEFAULT="#f58238"/>
+                <dmcolor key="error" color="#d32f2f" shade-50="#f9ecec" shade-100="#f9cfca" shade-200="#f6b2a9" shade-300="#f19488" shade-400="#e97669" shade-500="#df564c" shade-600="#d32f2f" shade-700="#c12b2b" shade-800="#b02727" shade-900="#9e2323" shade-950="#8d2020" shade-DEFAULT="#df564c"/>
+                <dmcolor key="info" color="#0288d1" shade-50="#ebf1f9" shade-100="#d0dff2" shade-200="#b4ccec" shade-300="#96bbe5" shade-400="#76a9df" shade-500="#5098d8" shade-600="#0288d1" shade-700="#027cbf" shade-800="#0271ae" shade-900="#02669d" shade-950="#015b8c" shade-DEFAULT="#5098d8"/>
+                <dmcolor key="neutral" color="#121212" shade-50="#ebebeb" shade-100="#c2c2c2" shade-200="#9b9b9b" shade-300="#757575" shade-400="#525252" shade-500="#303030" shade-600="#121212" shade-700="#111111" shade-800="#0f0f0f" shade-900="#0e0e0e" shade-950="#0c0c0c" shade-DEFAULT="#0b0b0b"/>
+            </dmdesignskill>
+            <dmdesignskill skill="fonts"></dmdesignskill>
+            <dmdesignskill skill="background" image_for_colors="true" advanced="true" filter_blur="0"></dmdesignskill>
+        </dmdesign>
+    </dmdesigns>
+    <dmlocked quasar-colors-primary="false" quasar-colors-secondary="false" quasar-colors-tertiary="false" quasar-colors-success="true" quasar-colors-warning="true" quasar-colors-error="true" quasar-colors-info="true" quasar-colors-neutral="true"></dmlocked>
+</project>

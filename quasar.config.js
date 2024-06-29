@@ -88,16 +88,6 @@ module.exports = configure(function (/* ctx */) {
             //... existing config
           },
         ],
-        [
-          require('unocss/vite').default,
-          {
-             presets: [
-                require('@unocss/preset-icons').default({
-                   prefix: 'i-', // default prefix, do not change
-                }),
-             ],
-          },
-       ],
       ]
     },
 
