@@ -1,0 +1,12 @@
+{
+  "name": "pdf-red-project",
+  "version": "0.0.1",
+  "description": "Um leitor de pdf",
+  "author": "Loocer",
+  "private": true,
+  "dependencies": {
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
