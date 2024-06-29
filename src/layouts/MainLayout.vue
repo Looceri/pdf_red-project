@@ -35,8 +35,8 @@
         <q-file v-model="selectedFile" label="Selecionar PDF do dispositivo" @input="handleFileSelected" />
 
         <q-card v-if="pdf">
-          <q-card-section>
-            <q-pdf-viewer :src="pdf" />
+          <q-card-section style="max-width: 100%; height: 85vh;"> <!-- Add styles here -->
+            <q-pdfviewer type="html5" :src="pdf" />
           </q-card-section>
         </q-card>
       </q-page>
@@ -61,13 +61,12 @@ function toggleLeftDrawer() {
 }
 
 function openPdf(blob) {
-  pdf.value = URL.createObjectURL(blob);
+  pdf.value = URL.createObjectURL(blob); // Convert Blob to URL
 }
 
 // Lógica para lidar com o PDF selecionado no q-file
 function handleFileSelected(file) {
   const selectedFile = file.target.files[0];
-  console.log(pdfs, pdf);
   if (selectedFile) {
     pdfs.value.push({
       filename: selectedFile.name,
@@ -106,3 +105,16 @@ watch(pdfs, (newPdfs) => {
   }))));
 });
 </script>
+
+<style scoped>
+.q-card-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.q-pdfviewer {
+  width: 100%;
+  height: 100%;
+}
+</style>
