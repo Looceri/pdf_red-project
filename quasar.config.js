@@ -21,8 +21,8 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
-      
-      
+
+
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
@@ -75,7 +75,29 @@ module.exports = configure(function (/* ctx */) {
           eslint: {
             lintCommand: 'eslint "./**/*.{js,mjs,cjs,vue}"'
           }
-        }, { server: false }]
+        }, { server: false }],
+        [
+          require("@pinegrow/vite-plugin").liveDesigner,{
+            quasar: {
+              /* Please ensure that you update the filenames and paths to accurately match those used in your project. */
+              configPath: 'quasar.config.js',
+              // themePath: false, // Set to false so that Design Panel is not used
+              // restartOnConfigUpdate: true,
+              restartOnThemeUpdate: true,
+            },
+            //... existing config
+          },
+        ],
+        [
+          require('unocss/vite').default,
+          {
+             presets: [
+                require('@unocss/preset-icons').default({
+                   prefix: 'i-', // default prefix, do not change
+                }),
+             ],
+          },
+       ],
       ]
     },
 
