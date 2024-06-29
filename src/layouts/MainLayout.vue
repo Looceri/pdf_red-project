@@ -18,55 +18,57 @@
 
     <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
       <q-list>
-        <q-item-label header class="text-white bg-red"> <!--- Cor do cabeçalho da lista -->
-          PDFs Recentes
-          <q-btn flat dense round icon="delete" @click="resetpdfs" class="float-right" size="sm" color="white" />
-        </q-item-label>
+        <q-expansion-item expand-icon="chevron_down" :label="'PDFs Recentes'" :header-class="'text-white bg-red'"
+          class="q-pa-sm">
+          <template v-slot:header-actions>
+          </template>
+          <q-separator />
+          <q-btn flat dense round icon="delete" @click="resetpdfs" class="float-right" size="sm" color="red" />
+          <q-scroll-area style="height: 200px;">
+            <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.data, pdf.nome)">
+              <q-item-section avatar>
+                <q-icon name="description" color="red" />
+              </q-item-section>
+              <q-item-section>
+                {{ pdf.nome }}
+              </q-item-section>
+              <q-btn flat dense round icon="delete" @click="removerPDF(index)" class="float-right" size="sm"
+                color="red" />
+            </q-item>
+            <q-empty v-if="pdfs.length === 0" icon="description" message="Nenhum PDF adicionado." />
+          </q-scroll-area>
+        </q-expansion-item>
+
         <q-separator />
-        <q-scroll-area style="height: 200px;">
-          <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.url)">
-            <q-item-section avatar>
-              <q-icon name="description" color="red" /> <!--- Cor do ícone -->
-            </q-item-section>
-            <q-item-section>
-              {{ pdf.nome }}
-            </q-item-section>
-            <q-btn flat dense round icon="delete" @click="removerPDF(index)" class="float-right" size="sm"
-              color="white" />
-          </q-item>
-          <q-empty v-if="pdfs && pdfs.length === 0" icon="description" message="Nenhum PDF adicionado." />
-        </q-scroll-area>
-      </q-list>
 
-      <q-separator />
-
-      <q-list>
-        <q-item-label header class="text-grey-8">
-          PDFs Carregados
+        <q-expansion-item expand-icon="chevron_down" :label="'PDFs Carregados'" :header-class="'text-grey-8'"
+          class="q-pa-sm">
+          <template v-slot:header-actions>
+          </template>
+          <q-separator />
           <q-btn flat dense round icon="delete" @click="limparPDFsCarregados" class="float-right" size="sm"
             color="red" />
-        </q-item-label>
-        <q-separator />
-        <q-scroll-area style="height: 200px;">
-          <q-item v-for="(pdf, index) in pdfsCarregados" :key="index" clickable @click="openPdf(pdf.url)">
-            <q-item-section avatar>
-              <q-icon name="description" />
-            </q-item-section>
-            <q-item-section>
-              {{ pdf.nome }}
-            </q-item-section>
-            <q-btn flat dense round icon="delete" @click="removerPDFCarregado(index)" class="float-right" size="sm"
-              color="red" />
-          </q-item>
-          <q-empty v-if="pdfsCarregados && pdfsCarregados.length === 0" icon="description"
-            message="Nenhum PDF carregado." />
-        </q-scroll-area>
+          <q-scroll-area style="height: 200px;">
+            <q-item v-for="(pdf, index) in pdfsCarregados" :key="index" clickable
+              @click="openPdf(pdf.data, pdf.nome)">
+              <q-item-section avatar>
+                <q-icon name="description" />
+              </q-item-section>
+              <q-item-section>
+                {{ pdf.nome }}
+              </q-item-section>
+              <q-btn flat dense round icon="delete" @click="removerPDFCarregado(index)" class="float-right" size="sm"
+                color="red" />
+            </q-item>
+            <q-empty v-if="pdfsCarregados.length === 0" icon="description" message="Nenhum PDF carregado." />
+          </q-scroll-area>
+        </q-expansion-item>
       </q-list>
     </q-drawer>
 
     <q-page-container>
       <q-page class="row">
-        <div v-if="pdfUrl" class="col-12 q-pa-md"> <!--- Mudança aqui -->
+        <div v-if="pdfUrl" class="col-12 q-pa-md">
           <q-card flat bordered class="full-height bg-transparent">
             <q-card-section class="bg-grey-1 full-height column bg-transparent">
               <q-inner-loading :showing="isLoading" class="absolute-center bg-transparent">
@@ -91,13 +93,11 @@ import { ref, onMounted } from 'vue';
 export default {
   setup() {
     const leftDrawerOpen = ref(false);
-    const leftDrawerWidth = ref(250);
     const pdfUrl = ref(null);
-    const pdfs = ref([]); // PDFs recentes do LocalStorage
-    const pdfsCarregados = ref([]); // PDFs carregados recentemente
+    const pdfs = ref([]);
+    const pdfsCarregados = ref([]);
     const isLoading = ref(false);
     const selectedFile = ref(null);
-    const filePickerVisible = ref(false); // Para controlar a cor do botão "add"
     const isHovering = ref(false);
 
     onMounted(() => {
@@ -108,23 +108,28 @@ export default {
       leftDrawerOpen.value = !leftDrawerOpen.value;
     }
 
-    function openPdf(url) {
+    function openPdf(data, nome) {
       isLoading.value = true;
       setTimeout(() => {
-        pdfUrl.value = url;
+        pdfUrl.value = data;
         isLoading.value = false;
+        // Atualiza o título da página com o nome do PDF (opcional)
+        document.title = nome || 'PDF Viewer';
       }, 500);
     }
 
     function adicionarPDF(file) {
       if (file) {
         if (file.type.startsWith('application/pdf')) {
-          const url = URL.createObjectURL(file);
-          const nomePDF = file.name;
-          pdfsCarregados.value.push({ nome: nomePDF, url: url });
-          salvarPDFNoLocalStorage(nomePDF, url);
-          openPdf(url);
-          selectedFile.value = null; // Limpa o q-file após a seleção
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const base64Data = event.target.result;
+            const nomePDF = file.name;
+            pdfsCarregados.value.push({ nome: nomePDF, data: base64Data });
+            openPdf(base64Data, nomePDF);
+            selectedFile.value = null;
+          };
+          reader.readAsDataURL(file);
         } else {
           console.error("O arquivo selecionado não é um PDF.");
         }
@@ -134,9 +139,8 @@ export default {
     }
 
     function removerPDF(index) {
-      pdfs.value.splice(index, 1);
-      // Atualizar o LocalStorage
-      salvarPDFsNoLocalStorage();
+      const pdfRemovido = pdfs.value.splice(index, 1)[0];
+      localStorage.removeItem(pdfRemovido.nome);
     }
 
     function removerPDFCarregado(index) {
@@ -144,33 +148,18 @@ export default {
     }
 
     function resetpdfs() {
-      if (confirm('Tem certeza que deseja eliminar a lista de PDFs?')) {
+      if (confirm('Tem certeza que deseja eliminar a lista de PDFs todos recentes?')) {
         localStorage.clear();
         pdfs.value = [];
-        pdfsCarregados.value = []; // Limpa também a lista de PDFs carregados
       }
-    }
-
-    // Funções auxiliares
-    function salvarPDFNoLocalStorage(nome, url) {
-      localStorage.setItem(nome, url);
     }
 
     function carregarPDFsDoLocalStorage() {
       for (let i = 0; i < localStorage.length; i++) {
         const nome = localStorage.key(i);
-        const url = localStorage.getItem(nome);
-        pdfs.value.push({ nome, url });
+        const data = localStorage.getItem(nome);
+        pdfs.value.push({ nome, data });
       }
-    }
-
-    function salvarPDFsNoLocalStorage() {
-      // NÃO LIMPE O localStorage
-      // localStorage.clear(); // Limpa o localStorage
-
-      pdfs.value.forEach(pdf => {
-        localStorage.setItem(pdf.nome, pdf.url);
-      });
     }
 
     function limparPDFsCarregados() {
@@ -179,12 +168,12 @@ export default {
 
     return {
       leftDrawerOpen,
-      leftDrawerWidth,
       pdfUrl,
       pdfs,
       pdfsCarregados,
       isLoading,
-      selectedFile, // Variável para o q-file
+      selectedFile,
+      isHovering,
       toggleLeftDrawer,
       openPdf,
       adicionarPDF,
@@ -192,8 +181,6 @@ export default {
       removerPDFCarregado,
       resetpdfs,
       limparPDFsCarregados,
-      filePickerVisible,
-      isHovering
     };
   }
 };
