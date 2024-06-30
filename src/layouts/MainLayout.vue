@@ -69,7 +69,7 @@
         <div v-if="pdfUrl" class="col-12 q-pa-md"> <!--- Mudança aqui -->
           <q-card flat bordered class="full-height bg-transparent">
             <q-card-section class="bg-grey-1 full-height column bg-transparent">
-              <q-inner-loading :showing="isLoading" class="absolute-center bg-transparent">
+              <q-inner-loading :showing="isLoading" class="absolute-center">
                 <q-spinner-gears size="100%" color="red" class="bg-transparent" />
               </q-inner-loading>
               <q-pdfviewer :src="pdfUrl" type="html5" style="height: 100%;"></q-pdfviewer>
