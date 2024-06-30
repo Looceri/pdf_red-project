@@ -16,14 +16,14 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
+    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered style="margin: 0">
       <q-list>
         <q-item-label header class="text-white bg-red"> <!--- Cor do cabeçalho da lista -->
           PDFs Recentes
           <q-btn flat dense round icon="delete" @click="resetpdfs" class="float-right" size="sm" color="white" />
         </q-item-label>
         <q-separator />
-        <q-scroll-area style="height: 200px;">
+        <q-scroll-area style="height: 44.7vh;">
           <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.url)">
             <q-item-section avatar>
               <q-icon name="description" color="red" /> <!--- Cor do ícone -->
@@ -32,7 +32,7 @@
               {{ pdf.nome }}
             </q-item-section>
             <q-btn flat dense round icon="delete" @click="removerPDF(index)" class="float-right" size="sm"
-              color="white" />
+              color="red" />
           </q-item>
           <q-empty v-if="pdfs && pdfs.length === 0" icon="description" message="Nenhum PDF adicionado." />
         </q-scroll-area>
@@ -40,17 +40,17 @@
 
       <q-separator />
 
-      <q-list>
-        <q-item-label header class="text-grey-8">
+      <q-list >
+        <q-item-label header class="text-white bg-red"> <!--- Cor do cabeçalho da lista -->
           PDFs Carregados
           <q-btn flat dense round icon="delete" @click="limparPDFsCarregados" class="float-right" size="sm"
-            color="red" />
+            color="white" />
         </q-item-label>
         <q-separator />
-        <q-scroll-area style="height: 200px;">
+        <q-scroll-area style="height: 44.7vh;">
           <q-item v-for="(pdf, index) in pdfsCarregados" :key="index" clickable @click="openPdf(pdf.url)">
             <q-item-section avatar>
-              <q-icon name="description" />
+              <q-icon name="description" color="red" /> <!--- Cor do ícone -->
             </q-item-section>
             <q-item-section>
               {{ pdf.nome }}
