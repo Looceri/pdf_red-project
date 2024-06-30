@@ -23,8 +23,31 @@ register(process.env.SERVICE_WORKER_FILE, {
     // console.log('Content has been cached for offline use.')
   },
 
-  updatefound (/* registration */) {
-    // console.log('New content is downloading.')
+  updatefound (registration) {
+    console.log('New content is downloading.')
+
+    const installingWorker = registration.installing;
+
+    installingWorker.onstatechange = () => {
+      if (installingWorker.state === 'installed') {
+        if (navigator.serviceWorker.controller) {
+          // Exibir notificação para o usuário
+          this.$q.notify({
+            message: 'Atualização disponível!',
+            color: 'primary',
+            actions: [
+              {
+                label: 'Atualizar',
+                color: 'white',
+                handler: () => {
+                  window.location.reload();
+                },
+              },
+            ],
+          });
+        }
+      }
+    };
   },
 
   updated (/* registration */) {

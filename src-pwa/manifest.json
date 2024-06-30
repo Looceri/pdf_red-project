@@ -1,7 +1,12 @@
 {
+  "name": "PDf REd App PWA",
+  "short_name": "PDf REd  App",
+  "description": "Um leitor de pdfs",
+  "display": "standalone",
+  "start_url": ".",
   "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#027be3",
+  "theme_color": "#f44336",
   "icons": [
     {
       "src": "icons/icon-128x128.png",
