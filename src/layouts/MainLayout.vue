@@ -7,7 +7,7 @@
           <q-avatar>
             <img src="../assets/Sem título.svg" />
           </q-avatar>
-          PDf REd
+          PDF Red
         </q-toolbar-title>
         <q-file v-if="pdfUrl" class="text-white" v-model="selectedFile" filled label="Pdf +" accept=".pdf" color="red"
           :label-color="isHovering ? 'red' : 'white'" :class="{ 'bg-white': isHovering }" outlined outlined-color="red"
@@ -18,7 +18,7 @@
 
     <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered style="margin: 0">
       <q-list>
-        <q-item-label header class="text-white bg-red"> <!--- Cor do cabeçalho da lista -->
+        <q-item-label header class="text-white bg-red">
           PDFs Recentes
           <q-btn flat dense round icon="delete" @click="resetpdfs" class="float-right" size="sm" color="white" />
         </q-item-label>
@@ -26,7 +26,7 @@
         <q-scroll-area style="height: 44.7vh;">
           <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.url)">
             <q-item-section avatar>
-              <q-icon name="description" color="red" /> <!--- Cor do ícone -->
+              <q-icon name="description" color="red" />
             </q-item-section>
             <q-item-section>
               {{ pdf.nome }}
@@ -40,8 +40,8 @@
 
       <q-separator />
 
-      <q-list >
-        <q-item-label header class="text-white bg-red"> <!--- Cor do cabeçalho da lista -->
+      <q-list>
+        <q-item-label header class="text-white bg-red">
           PDFs Carregados
           <q-btn flat dense round icon="delete" @click="limparPDFsCarregados" class="float-right" size="sm"
             color="white" />
@@ -50,7 +50,7 @@
         <q-scroll-area style="height: 44.7vh;">
           <q-item v-for="(pdf, index) in pdfsCarregados" :key="index" clickable @click="openPdf(pdf.url)">
             <q-item-section avatar>
-              <q-icon name="description" color="red" /> <!--- Cor do ícone -->
+              <q-icon name="description" color="red" />
             </q-item-section>
             <q-item-section>
               {{ pdf.nome }}
@@ -66,14 +66,13 @@
 
     <q-page-container>
       <q-page class="row">
-        <div v-if="pdfUrl" class="col-12 q-pa-md"> <!--- Mudança aqui -->
+        <div v-if="pdfUrl" class="col-12 q-pa-md">
           <q-card flat bordered class="full-height bg-transparent">
             <q-card-section class="bg-grey-1 full-height column bg-transparent">
               <q-inner-loading :showing="isLoading" class="absolute-center">
                 <q-spinner-gears size="100%" color="red" class="bg-transparent" />
               </q-inner-loading>
-              <q-pdfviewer :src="pdfUrl" type="html5" style="height: 100%;"></q-pdfviewer>
-            </q-card-section>
+              <canvas ref="canvasRef" class="full-height"></canvas> </q-card-section>
           </q-card>
         </div>
         <div v-else :class="{ 'col-12': !pdfUrl }" class="q-pa-md full-height column justify-center items-center">
@@ -87,18 +86,17 @@
 
 <script>
 import { ref, onMounted } from 'vue';
+import { getDocument } from 'pdfjs-dist';
 
 export default {
   setup() {
     const leftDrawerOpen = ref(false);
-    const leftDrawerWidth = ref(250);
     const pdfUrl = ref(null);
-    const pdfs = ref([]); // PDFs recentes do LocalStorage
-    const pdfsCarregados = ref([]); // PDFs carregados recentemente
+    const pdfs = ref([]);
+    const pdfsCarregados = ref([]);
     const isLoading = ref(false);
     const selectedFile = ref(null);
-    const filePickerVisible = ref(false); // Para controlar a cor do botão "add"
-    const isHovering = ref(false);
+    const canvasRef = ref(null);
 
     onMounted(() => {
       carregarPDFsDoLocalStorage();
@@ -108,12 +106,37 @@ export default {
       leftDrawerOpen.value = !leftDrawerOpen.value;
     }
 
-    function openPdf(url) {
+    async function openPdf(url) {
       isLoading.value = true;
-      setTimeout(() => {
-        pdfUrl.value = url;
+      try {
+        // Wait for getDocument promise to resolve
+        const pdfDoc = await getDocument(url).promise;
+
+        const numPages = pdfDoc.numPages;
+        renderPage(pdfDoc, 1); // Now safe to call renderPage
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+      } finally {
         isLoading.value = false;
-      }, 500);
+      }
+    }
+
+    async function renderPage(pdfDoc, pageNumber) {
+      const page = await pdfDoc.getPage(pageNumber);
+      const viewport = page.getViewport({ scale: 1.5 });
+
+      const canvas = canvasRef.value;
+      const context = canvas.getContext('2d');
+
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport,
+      };
+
+      await page.render(renderContext);
     }
 
     function adicionarPDF(file) {
@@ -124,7 +147,7 @@ export default {
           pdfsCarregados.value.push({ nome: nomePDF, url: url });
           salvarPDFNoLocalStorage(nomePDF, url);
           openPdf(url);
-          selectedFile.value = null; // Limpa o q-file após a seleção
+          selectedFile.value = null;
         } else {
           console.error("O arquivo selecionado não é um PDF.");
         }
@@ -179,12 +202,12 @@ export default {
 
     return {
       leftDrawerOpen,
-      leftDrawerWidth,
       pdfUrl,
       pdfs,
       pdfsCarregados,
       isLoading,
-      selectedFile, // Variável para o q-file
+      selectedFile,
+      canvasRef,
       toggleLeftDrawer,
       openPdf,
       adicionarPDF,
@@ -192,8 +215,6 @@ export default {
       removerPDFCarregado,
       resetpdfs,
       limparPDFsCarregados,
-      filePickerVisible,
-      isHovering
     };
   }
 };
