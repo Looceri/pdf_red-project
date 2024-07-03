@@ -10,7 +10,9 @@
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "deploy": "firebase deploy",
+    "build-deploy": "npm run build && npm run deploy"
   },
   "dependencies": {
     "@capacitor/android": "^6.1.0",

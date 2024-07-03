@@ -7,12 +7,12 @@
           <q-avatar>
             <img src="../assets/Sem título.svg" />
           </q-avatar>
-          PDF Red
+          PDf REd
         </q-toolbar-title>
         <q-file v-if="pdfUrl" class="text-white" v-model="selectedFile" filled label="Pdf +" accept=".pdf" color="red"
           :label-color="isHovering ? 'red' : 'white'" :class="{ 'bg-white': isHovering }" outlined outlined-color="red"
-          @update:model-value="adicionarPDF" style="box-shadow: none;
-                 width: 18vw;" @mouseover="isHovering = true" @mouseleave="isHovering = false" />
+          @update:model-value="adicionarPDF" style="box-shadow: none; width: 18vw" @mouseover="isHovering = true"
+          @mouseleave="isHovering = false" />
       </q-toolbar>
     </q-header>
 
@@ -23,8 +23,8 @@
           <q-btn flat dense round icon="delete" @click="resetpdfs" class="float-right" size="sm" color="white" />
         </q-item-label>
         <q-separator />
-        <q-scroll-area style="height: 44.7vh;">
-          <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.url)">
+        <q-scroll-area style="height: 44.7vh">
+          <q-item v-for="(pdf, index) in pdfs" :key="index" clickable @click="openPdf(pdf.data, pdf.nome)">
             <q-item-section avatar>
               <q-icon name="description" color="red" />
             </q-item-section>
@@ -34,7 +34,7 @@
             <q-btn flat dense round icon="delete" @click="removerPDF(index)" class="float-right" size="sm"
               color="red" />
           </q-item>
-          <q-empty v-if="pdfs && pdfs.length === 0" icon="description" message="Nenhum PDF adicionado." />
+          <q-empty v-if="pdfs.length === 0" icon="description" message="Nenhum PDF adicionado." />
         </q-scroll-area>
       </q-list>
 
@@ -47,8 +47,8 @@
             color="white" />
         </q-item-label>
         <q-separator />
-        <q-scroll-area style="height: 44.7vh;">
-          <q-item v-for="(pdf, index) in pdfsCarregados" :key="index" clickable @click="openPdf(pdf.url)">
+        <q-scroll-area style="height: 44.7vh">
+          <q-item v-for="(pdf, index) in pdfsCarregados" :key="index" clickable @click="openPdf(pdf.url, pdf.nome)">
             <q-item-section avatar>
               <q-icon name="description" color="red" />
             </q-item-section>
@@ -58,8 +58,7 @@
             <q-btn flat dense round icon="delete" @click="removerPDFCarregado(index)" class="float-right" size="sm"
               color="red" />
           </q-item>
-          <q-empty v-if="pdfsCarregados && pdfsCarregados.length === 0" icon="description"
-            message="Nenhum PDF carregado." />
+          <q-empty v-if="pdfsCarregados.length === 0" icon="description" message="Nenhum PDF carregado." />
         </q-scroll-area>
       </q-list>
     </q-drawer>
@@ -72,11 +71,12 @@
               <q-inner-loading :showing="isLoading" class="absolute-center">
                 <q-spinner-gears size="100%" color="red" class="bg-transparent" />
               </q-inner-loading>
-              <canvas ref="canvasRef" class="full-height"></canvas> </q-card-section>
+              <q-pdfviewer :src="pdfUrl" type="html5" style="height: 100%" />
+            </q-card-section>
           </q-card>
         </div>
         <div v-else :class="{ 'col-12': !pdfUrl }" class="q-pa-md full-height column justify-center items-center">
-          <q-file v-model="selectedFile" filled label="Selecione um PDF" accept=".pdf" style="width: 100%;" color="red"
+          <q-file v-model="selectedFile" filled label="Selecione um PDF" accept=".pdf" style="width: 100%" color="red"
             outlined outlined-color="red" @update:model-value="adicionarPDF" />
         </div>
       </q-page>
@@ -85,80 +85,72 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import { getDocument } from 'pdfjs-dist';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 export default {
   setup() {
     const leftDrawerOpen = ref(false);
     const pdfUrl = ref(null);
-    const pdfs = ref([]);
-    const pdfsCarregados = ref([]);
+    const pdfs = ref([]); // PDFs Recentes (permanent)
+    const pdfsCarregados = ref([]); // PDFs Carregados (temporary)
     const isLoading = ref(false);
     const selectedFile = ref(null);
-    const canvasRef = ref(null);
+    const isHovering = ref(false);
+    const pdfBlobUrl = ref(null);
 
     onMounted(() => {
       carregarPDFsDoLocalStorage();
+    });
+
+    onBeforeUnmount(() => {
+      if (pdfBlobUrl.value) {
+        URL.revokeObjectURL(pdfBlobUrl.value);
+      }
     });
 
     function toggleLeftDrawer() {
       leftDrawerOpen.value = !leftDrawerOpen.value;
     }
 
-    async function openPdf(url) {
+    function openPdf(data, nome) {
       isLoading.value = true;
-      try {
-        // Wait for getDocument promise to resolve
-        const pdfDoc = await getDocument(url).promise;
 
-        const numPages = pdfDoc.numPages;
-        renderPage(pdfDoc, 1); // Now safe to call renderPage
-      } catch (error) {
-        console.error('Error loading PDF:', error);
-      } finally {
+      if (typeof data === 'string' && data.startsWith('data:application/pdf')) {
+        const byteCharacters = atob(data.split(',')[1]);
+        const byteArrays = new Uint8Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteArrays[i] = byteCharacters.charCodeAt(i);
+        }
+        const blob = new Blob([byteArrays], { type: 'application/pdf' });
+        pdfBlobUrl.value = URL.createObjectURL(blob);
+        pdfUrl.value = pdfBlobUrl.value;
+        isLoading.value = false;
+      } else {
+        pdfUrl.value = data;
         isLoading.value = false;
       }
     }
 
-    async function renderPage(pdfDoc, pageNumber) {
-      const page = await pdfDoc.getPage(pageNumber);
-      const viewport = page.getViewport({ scale: 1.5 });
-
-      const canvas = canvasRef.value;
-      const context = canvas.getContext('2d');
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport,
-      };
-
-      await page.render(renderContext);
-    }
-
     function adicionarPDF(file) {
-      if (file) {
-        if (file.type.startsWith('application/pdf')) {
-          const url = URL.createObjectURL(file);
-          const nomePDF = file.name;
-          pdfsCarregados.value.push({ nome: nomePDF, url: url });
-          salvarPDFNoLocalStorage(nomePDF, url);
-          openPdf(url);
+      if (file && file.type.startsWith('application/pdf')) {
+        console.log(file);
+        const nomePDF = file.name;
+        const fileReader = new FileReader();
+        fileReader.onload = (e) => {
+          const base64Data = e.target.result;
+          pdfs.value.push({ nome: nomePDF, data: base64Data }); // Add to PDFs Recentes
+          salvarPDFsNoLocalStorage();
+          openPdf(base64Data, nomePDF);
           selectedFile.value = null;
-        } else {
-          console.error("O arquivo selecionado não é um PDF.");
-        }
+        };
+        fileReader.readAsDataURL(file);
       } else {
-        console.error("Por favor, selecione um PDF.");
+        console.error('Selecione um arquivo PDF válido.');
       }
     }
-
+    
     function removerPDF(index) {
       pdfs.value.splice(index, 1);
-      // Atualizar o LocalStorage
       salvarPDFsNoLocalStorage();
     }
 
@@ -170,29 +162,22 @@ export default {
       if (confirm('Tem certeza que deseja eliminar a lista de PDFs?')) {
         localStorage.clear();
         pdfs.value = [];
-        pdfsCarregados.value = []; // Limpa também a lista de PDFs carregados
+        pdfsCarregados.value = [];
       }
-    }
-
-    // Funções auxiliares
-    function salvarPDFNoLocalStorage(nome, url) {
-      localStorage.setItem(nome, url);
     }
 
     function carregarPDFsDoLocalStorage() {
       for (let i = 0; i < localStorage.length; i++) {
         const nome = localStorage.key(i);
-        const url = localStorage.getItem(nome);
-        pdfs.value.push({ nome, url });
+        const data = localStorage.getItem(nome);
+        pdfs.value.push({ nome, data });
       }
     }
 
     function salvarPDFsNoLocalStorage() {
-      // NÃO LIMPE O localStorage
-      // localStorage.clear(); // Limpa o localStorage
-
+      localStorage.clear();
       pdfs.value.forEach(pdf => {
-        localStorage.setItem(pdf.nome, pdf.url);
+        localStorage.setItem(pdf.nome, pdf.data);
       });
     }
 
@@ -207,16 +192,19 @@ export default {
       pdfsCarregados,
       isLoading,
       selectedFile,
-      canvasRef,
+      isHovering,
+      pdfBlobUrl,
       toggleLeftDrawer,
       openPdf,
       adicionarPDF,
       removerPDF,
       removerPDFCarregado,
       resetpdfs,
+      carregarPDFsDoLocalStorage,
+      salvarPDFsNoLocalStorage,
       limparPDFsCarregados,
     };
-  }
+  },
 };
 </script>
 
