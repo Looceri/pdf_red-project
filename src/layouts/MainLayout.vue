@@ -148,7 +148,7 @@ export default {
         console.error('Selecione um arquivo PDF válido.');
       }
     }
-    
+
     function removerPDF(index) {
       pdfs.value.splice(index, 1);
       salvarPDFsNoLocalStorage();
